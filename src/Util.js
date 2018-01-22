@@ -1,13 +1,27 @@
 import React from 'react';
 import {Dimensions, Text} from 'react-native';
 
+export const Color1 = '#5cdb52';
+export const Color2 = '#42c9da';
 export const {width: viewportWidth, height: viewportHeight} = Dimensions.get('window');
 
 export const wp = (percentage) => {
     const value = (percentage * viewportWidth) / 100;
     return Math.round(value);
 };
-
+export const getMonth = () => {
+    let now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let prev = new Date(`${year}-${month}-1`).getTime();
+    let next;
+    if (month === 12) {
+        next = new Date(`${year + 1}-1-1`).getTime();
+    } else {
+        next = new Date(`${year}-${month + 1}-1`).getTime();
+    }
+    return [prev, next]
+};
 export const getIcon = (str) => {
     switch (str) {
         case '中原银行': {
@@ -61,7 +75,45 @@ export const getIcon = (str) => {
 
     }
 };
-
+export const BankMap = {
+    95516: {
+        name: '中国银联',
+    },
+    95588: {
+        name: '工商银行',
+        pay: /您尾号.*工商银行支出.*(\d+(\.\d+)?)元，余额(\d+(\.\d+)?)元。/,
+        income: '',
+    },
+    95599: {
+        name: '农业银行',
+    },
+    95566: {
+        name: '中国银行'
+    },
+    95533: {
+        name: '建设银行',
+        pay: /您尾号.*消费支出人民币(\d+(\.\d+)?)元,活期可用余额(\d+(\.\d+)?)元。/
+    },
+    95595: {
+        name: '光大银行',
+    },
+    95568: {
+        name: '民生银行',
+    },
+    95577: {
+        name: '华夏银行',
+    },
+    95558: {
+        name: '中信银行',
+    },
+    95528: {
+        name: '浦东银行',
+    },
+    95555: {
+        name: '招商银行',
+        pay: /您账户.*支付扣款，人民币(\d+(\.\d+)?)/,
+    }
+};
 export const colorHex = (rgb) => {
     let _this = rgb;
     let reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;

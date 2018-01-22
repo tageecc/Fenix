@@ -6,79 +6,53 @@
 
 import React, {Component} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
-import Manager from 'react-native-manager';
 import LinearGradient from 'react-native-linear-gradient';
 
 import Header from './component/header';
 import Carousel from './component/carousel';
 import Card from './component/card';
-import {gradientColor} from "./Util";
+import {viewportWidth, viewportHeight, gradientColor, BankMap, Color1, Color2} from "./Util";
+import {base} from "./Analyse";
+import Spinner from 'react-native-spinkit';
 
 export default class App extends Component {
 
     state = {
-        js_cost: 0,
-        gs_cost: 0,
-        zs_cost: 0,
-        cars: [
-            {title: 'Car A', value: 'Brand A'},
-            {title: 'Car B ', value: 'Brand B'},
-            {title: 'Car C', value: 'Brand C'},
-        ],
+        cost: {},
+        showSpinner: false,
     };
 
-    async componentDidMount() {
-        let {js_cost, zs_cost, gs_cost} = this.state;
-        try {
-            let smsList = await Manager.getSms(
-                {
-                    address: '95533|95588|95555',
-                    date: {
-                        gt: '1512057600000',
-                        lt: '1514736000000'
-                    }
-                });
-            smsList.map(sms => {
-                let {body, address} = sms;
+    componentDidMount() {
+        this.calculate();
+    }
 
-                if (address === '95533') {
-                    let matcher = body.match(/支出人民币(.*?)元/);
-                    matcher && (js_cost += parseFloat(matcher[1]));
-                }
-                if (address === '95555') {
-                    let matcher = body.match(/扣款.*人民币(.*?)\[/);
-                    matcher && (zs_cost += parseFloat(matcher[1]));
-                }
-                if (address === '95588') {
-                    let matcher = body.match(/支出（.*?）(.*?)元/);
-                    matcher && (gs_cost += parseFloat(matcher[1]));
-                }
-                this.setState({
-                    js_cost,
-                    zs_cost,
-                    gs_cost
-                });
-            })
-        } catch (e) {
-            console.log(e);
-        }
-
+    calculate() {
+        this.setState({showSpinner: true});
+        base().then(cost => {
+            this.setState({cost,showSpinner: false})
+        })
     }
 
     render() {
-        let {js_cost, zs_cost, gs_cost} = this.state;
-        let colors = gradientColor('#5cdb52', '#42c9da', 3);
+        let {cost, showSpinner} = this.state;
+        let colors = gradientColor(Color1, Color2, Object.keys(cost).length);
+        console.log(cost);
         return <View>
             <Header/>
-            <Carousel total={gs_cost + zs_cost + js_cost}/>
-            <Card bank={'工商银行'} cost={gs_cost} color={colors[0]}/>
-            <Card bank={'招商银行'} cost={zs_cost} color={colors[1]}/>
-            <Card bank={'建设银行'} cost={js_cost} color={colors[2]}/>
-            <TouchableOpacity activeOpacity={0.8}>
-                <LinearGradient colors={['#5cdb52', '#45d8bb', '#42c9da']} style={styles.manageBtn}>
+            <Carousel data={cost}/>
+            {
+                Object.keys(cost).map((ct, i) => {
+                    return <Card key={i} bank={BankMap[ct].name} cost={cost[ct]} color={colors[i]}/>
+                })
+            }
+            <TouchableOpacity activeOpacity={0.8} onPress={this.calculate.bind(this)}>
+                <LinearGradient colors={[Color1, Color2]} style={styles.manageBtn}>
                     <Text style={styles.manageBtnTxt}>重新分析</Text>
                 </LinearGradient>
             </TouchableOpacity>
+            <View style={styles.spinner}>
+                <Spinner size={50} type={'9CubeGrid'} color={'#46d9c4'} isVisible={showSpinner}/>
+            </View>
         </View>
     }
 }
@@ -101,6 +75,14 @@ const styles = StyleSheet.create({
         color: '#f5f5f5',
         fontSize: 12,
 
+    },
+    spinner: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: viewportWidth,
+        height: viewportHeight
     }
-
 });
