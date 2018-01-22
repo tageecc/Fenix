@@ -1,31 +1,38 @@
-import {BankMap, getMonth} from "./Util";
+import {BankMap, getMonthByDelta} from "./Util";
 import Manager from "react-native-manager";
 
-export const base = async () => {
+export const base = async (deltaMonth = 0) => {
     try {
-        let cost = {},nowMonth = getMonth();
+        let pay = {}, income = {}, month = getMonthByDelta(deltaMonth);
         let smsList = await Manager.getSms(
             {
                 address: Object.keys(BankMap).join('|'),
                 date: {
-                    gt: nowMonth[0],
-                    lt: nowMonth[1]
+                    gt: month[0],
+                    lt: month[1]
                 }
             });
+
         smsList.map(({body, address}) => {
             if (!BankMap[address]) return true;
-
-            let matcher = body.match(BankMap[address].pay);
-            if (matcher) {
-                if (!cost[address]) {
-                    cost[address] = parseFloat(matcher[1]);
+            let payMatcher = BankMap[address].pay ? body.match(BankMap[address].pay) : null;
+            let incomeMatcher = BankMap[address].income ? body.match(BankMap[address].income) : null;
+            if (payMatcher) {
+                if (!pay[address]) {
+                    pay[address] = parseFloat(payMatcher[1]);
                 } else {
-                    cost[address] += parseFloat(matcher[1]);
+                    pay[address] += parseFloat(payMatcher[1]);
+                }
+            }
+            if (incomeMatcher) {
+                if (!income[address]) {
+                    income[address] = parseFloat(incomeMatcher[1]);
+                } else {
+                    income[address] += parseFloat(incomeMatcher[1]);
                 }
             }
         });
-
-        return cost;
+        return {pay, income};
 
     } catch (e) {
         console.log(e);

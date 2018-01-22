@@ -11,14 +11,15 @@ import LinearGradient from 'react-native-linear-gradient';
 import Header from './component/header';
 import Carousel from './component/carousel';
 import Card from './component/card';
-import {viewportWidth, viewportHeight, gradientColor, BankMap, Color1, Color2} from "./Util";
+import {viewportWidth, viewportHeight, gradientColor, BankMap, Color1, Color2, combineObject} from "./Util";
 import {base} from "./Analyse";
 import Spinner from 'react-native-spinkit';
 
 export default class App extends Component {
 
     state = {
-        cost: {},
+        pay: {},
+        income: {},
         showSpinner: false,
     };
 
@@ -28,31 +29,33 @@ export default class App extends Component {
 
     calculate() {
         this.setState({showSpinner: true});
-        base().then(cost => {
-            this.setState({cost,showSpinner: false})
+        base(-1).then(({pay, income}) => {
+            this.setState({pay, income, showSpinner: false})
         })
     }
 
     render() {
-        let {cost, showSpinner} = this.state;
-        let colors = gradientColor(Color1, Color2, Object.keys(cost).length);
-        console.log(cost);
+        let {pay, income, showSpinner} = this.state;
+        let colors = gradientColor(Color1, Color2, Object.keys(pay).length);
+        let cardData = combineObject(pay, income);
         return <View>
             <Header/>
-            <Carousel data={cost}/>
+            <Carousel data={{pay, income}}/>
             {
-                Object.keys(cost).map((ct, i) => {
-                    return <Card key={i} bank={BankMap[ct].name} cost={cost[ct]} color={colors[i]}/>
-                })
+                Object.keys(cardData).map((data, i) => <Card key={i} bank={BankMap[data].name} color={colors[i]}
+                                                             data={cardData[data]}/>)
             }
             <TouchableOpacity activeOpacity={0.8} onPress={this.calculate.bind(this)}>
                 <LinearGradient colors={[Color1, Color2]} style={styles.manageBtn}>
                     <Text style={styles.manageBtnTxt}>重新分析</Text>
                 </LinearGradient>
             </TouchableOpacity>
-            <View style={styles.spinner}>
-                <Spinner size={50} type={'9CubeGrid'} color={'#46d9c4'} isVisible={showSpinner}/>
-            </View>
+            {
+                showSpinner && <View style={styles.spinner}>
+                    <Spinner size={50} type={'9CubeGrid'} color={'#46d9c4'} isVisible={true}/>
+                </View>
+            }
+
         </View>
     }
 }
@@ -83,6 +86,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: viewportWidth,
-        height: viewportHeight
+        height: viewportHeight,
+        elevation: 2,
     }
 });

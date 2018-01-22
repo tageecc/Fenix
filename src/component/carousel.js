@@ -7,7 +7,7 @@ import {wp, viewportWidth, Color1, Color2} from '../Util';
 export default class CarouselComponent extends Component {
 
     renderItem({item, index}) {
-        let {data} = this.props;
+        let {data:{pay,income}} = this.props;
         return (
             <LinearGradient colors={[Color1, Color2]} style={styles.card}>
                 <Text
@@ -15,11 +15,11 @@ export default class CarouselComponent extends Component {
                 <View style={styles.costContain}>
                     <View style={[styles.bdR, styles.content]}>
                         <Text style={styles.costTit}>收入</Text>
-                        <Text style={styles.cost}>2333￥</Text>
+                        <Text style={styles.cost}>￥ {eval(Object.values(income).join("+"))}</Text>
                     </View>
                     <View style={styles.content}>
                         <Text style={styles.costTit}>支出</Text>
-                        <Text style={styles.cost}>￥ {eval(Object.values(data).join("+"))}</Text>
+                        <Text style={styles.cost}>￥ {eval(Object.values(pay).join("+"))}</Text>
                     </View>
                 </View>
             </LinearGradient>
@@ -27,14 +27,9 @@ export default class CarouselComponent extends Component {
     }
 
     render() {
-        let {data} = this.props;
-        let _data = [];
-        Object.keys(data).map(ct => {
-            _data.push({})
-        });
         return (
             <Carousel
-                data={_data}
+                data={[0,0,0]}
                 renderItem={this.renderItem.bind(this)}
                 sliderWidth={viewportWidth}
                 itemWidth={wp(80)}

@@ -9,10 +9,27 @@ export const wp = (percentage) => {
     const value = (percentage * viewportWidth) / 100;
     return Math.round(value);
 };
-export const getMonth = () => {
+export const getMonth = (_month, _year) => {
     let now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
+    let year = _year || now.getFullYear();
+    let month = _month || now.getMonth() + 1;
+    let prev = new Date(`${year}-${month}-1`).getTime();
+    let next;
+    if (month === 12) {
+        next = new Date(`${year + 1}-1-1`).getTime();
+    } else {
+        next = new Date(`${year}-${month + 1}-1`).getTime();
+    }
+    return [prev, next]
+};
+
+export const getMonthByDelta = (delta) => {
+    let now = new Date();
+    let year = now.getFullYear() + parseInt(delta / 12);
+    let month = now.getMonth() + 1 + delta % 12;
+    year = month < 1 ? (year - 1) : month > 12 ? (year + 1) : year;
+    month = month < 1 ? (month + 12) : month > 12 ? (month - 12) : month;
+    console.log('getMonthByDelta', year, month);
     let prev = new Date(`${year}-${month}-1`).getTime();
     let next;
     if (month === 12) {
@@ -92,7 +109,7 @@ export const BankMap = {
     },
     95533: {
         name: '建设银行',
-        pay: /您尾号.*消费支出人民币(\d+(\.\d+)?)元,活期可用余额(\d+(\.\d+)?)元。/
+        pay: /您尾号.*消费支出人民币(\d+(\.\d+)?)元,活期.*余额(\d+(\.\d+)?)元。/
     },
     95595: {
         name: '光大银行',
@@ -112,6 +129,7 @@ export const BankMap = {
     95555: {
         name: '招商银行',
         pay: /您账户.*支付扣款，人民币(\d+(\.\d+)?)/,
+        income: /您账户.*入账工资，人民币(\d+(\.\d+)?)。\[招商银行\]/
     }
 };
 export const colorHex = (rgb) => {
@@ -186,4 +204,17 @@ export const gradientColor = (startColor, endColor, step) => {
         colorArr.push(hex);
     }
     return colorArr;
+};
+
+export const combineObject = (pay, income) => {
+    let res = {};
+    Object.keys(pay).map(p => {
+        if (!res[p]) res[p] = {};
+        res[p]['pay'] = pay[p];
+    });
+    Object.keys(income).map(p => {
+        if (!res[p]) res[p] = {};
+        res[p]['income'] = income[p];
+    });
+    return res;
 };
