@@ -3,13 +3,13 @@ import Manager from "react-native-manager";
 
 export const base = async (deltaMonth = 0) => {
     try {
-        let pay = {}, income = {}, month = getMonthByDelta(deltaMonth);
+        let pay = {}, income = {}, {year, month, prev, next} = getMonthByDelta(deltaMonth);
         let smsList = await Manager.getSms(
             {
                 address: Object.keys(BankMap).join('|'),
                 date: {
-                    gt: month[0],
-                    lt: month[1]
+                    gt: prev,
+                    lt: next
                 }
             });
 
@@ -32,10 +32,25 @@ export const base = async (deltaMonth = 0) => {
                 }
             }
         });
-        return {pay, income};
+        return {year, month, pay, income};
 
     } catch (e) {
         console.log(e);
     }
 
+};
+export const trend = async (deltaYear = 0) => {
+    deltaYear = Math.abs(deltaYear);
+    let res = [];
+    let now = new Date();
+    let month = now.getMonth() + 1;
+
+    for (let i = (deltaYear - 1) * 12 + month; i <= deltaYear * 12; i++) {
+        let {year, month, pay, income} = await base(-i);
+        let perMonthTotalPay = eval(Object.values(pay).join('+'));
+        let perMonthTotalIncome = eval(Object.values(income).join('+'));
+        if (!perMonthTotalPay && !perMonthTotalIncome) continue;
+        res.push({year, month, perMonthTotalPay, perMonthTotalIncome})
+    }
+    return res;
 };

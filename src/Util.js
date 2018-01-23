@@ -29,7 +29,7 @@ export const getMonthByDelta = (delta) => {
     let month = now.getMonth() + 1 + delta % 12;
     year = month < 1 ? (year - 1) : month > 12 ? (year + 1) : year;
     month = month < 1 ? (month + 12) : month > 12 ? (month - 12) : month;
-    console.log('getMonthByDelta', year, month);
+
     let prev = new Date(`${year}-${month}-1`).getTime();
     let next;
     if (month === 12) {
@@ -37,8 +37,9 @@ export const getMonthByDelta = (delta) => {
     } else {
         next = new Date(`${year}-${month + 1}-1`).getTime();
     }
-    return [prev, next]
+    return {year, month, prev, next}
 };
+
 export const getIcon = (str) => {
     switch (str) {
         case '中原银行': {
@@ -207,6 +208,8 @@ export const gradientColor = (startColor, endColor, step) => {
 };
 
 export const combineObject = (pay, income) => {
+    if (!pay && !income) return {};
+
     let res = {};
     Object.keys(pay).map(p => {
         if (!res[p]) res[p] = {};
