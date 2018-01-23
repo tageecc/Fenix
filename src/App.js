@@ -29,19 +29,20 @@ export default class App extends Component {
 
     async calculate() {
         this.setState({showSpinner: true});
-        let monthData = await base(-1);
+        let monthData = await base(0);
+        let lastMonthData = await base(-1);
         let trendData = await trend(-1);
-        this.setState({monthData, trendData, showSpinner: false})
+        this.setState({monthData, trendData, lastMonthData, showSpinner: false})
     }
 
     render() {
-        let {monthData, trendData, showSpinner} = this.state;
+        let {monthData, lastMonthData, trendData, showSpinner} = this.state;
         let colors = gradientColor(Color1, Color2, Object.keys(monthData.pay || 0).length);
         let cardData = combineObject(monthData.pay, monthData.income);
         return (
             <View>
                 <Header/>
-                <Carousel monthData={monthData} trendData={trendData}/>
+                <Carousel monthData={monthData} lastMonthData={lastMonthData} trendData={trendData}/>
                 {
                     Object.keys(cardData).map((data, i) => <Card key={i} bank={BankMap[data].name} color={colors[i]}
                                                                  data={cardData[data]}/>)

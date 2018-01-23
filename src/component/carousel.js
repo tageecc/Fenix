@@ -8,8 +8,8 @@ import {VictoryLine, VictoryChart, VictoryAxis} from "victory-native";
 export default class CarouselComponent extends Component {
 
     renderItem({item, index}) {
-        let {monthData: {year, month, pay, income}, trendData} = this.props;
-        if (!year) return null;
+        let {monthData, lastMonthData, trendData} = this.props;
+        if (!monthData.year) return null;
         let cnt = null;
         if (index === 0) {
             let payData = [], incomeData = [];
@@ -43,6 +43,7 @@ export default class CarouselComponent extends Component {
             );
         }
         if (index === 1) {
+            let {year, month, pay, income} = monthData;
             cnt = (
                 <View>
                     <Text
@@ -50,11 +51,30 @@ export default class CarouselComponent extends Component {
                     <View style={styles.costContain}>
                         <View style={[styles.bdR, styles.content]}>
                             <Text style={styles.costTit}>收入</Text>
-                            <Text style={styles.cost}>￥ {eval(Object.values(income).join("+"))}</Text>
+                            <Text style={styles.cost}>￥ {eval(Object.values(income).join("+")) || 0}</Text>
                         </View>
                         <View style={styles.content}>
                             <Text style={styles.costTit}>支出</Text>
-                            <Text style={styles.cost}>￥ {eval(Object.values(pay).join("+"))}</Text>
+                            <Text style={styles.cost}>￥ {eval(Object.values(pay).join("+")) || 0}</Text>
+                        </View>
+                    </View>
+                </View>
+            )
+        }
+        if (index === 2) {
+            let {year, month, pay, income} = lastMonthData;
+            cnt = (
+                <View>
+                    <Text
+                        style={styles.date}>{`${year}年 ${month}月`}</Text>
+                    <View style={styles.costContain}>
+                        <View style={[styles.bdR, styles.content]}>
+                            <Text style={styles.costTit}>收入</Text>
+                            <Text style={styles.cost}>￥ {eval(Object.values(income).join("+")) || 0}</Text>
+                        </View>
+                        <View style={styles.content}>
+                            <Text style={styles.costTit}>支出</Text>
+                            <Text style={styles.cost}>￥ {eval(Object.values(pay).join("+")) || 0}</Text>
                         </View>
                     </View>
                 </View>
