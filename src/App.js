@@ -20,6 +20,7 @@ export default class App extends Component {
     state = {
         monthData: {},
         trendData: [],
+        cardData:{},
         showSpinner: false,
     };
 
@@ -32,17 +33,27 @@ export default class App extends Component {
         let monthData = await base(0);
         let lastMonthData = await base(-1);
         let trendData = await trend(-1);
-        this.setState({monthData, trendData, lastMonthData, showSpinner: false})
+        this.setState({
+            monthData,
+            trendData,
+            lastMonthData,
+            cardData: combineObject(monthData.pay, monthData.income),
+            showSpinner: false
+        })
+    }
+
+    setCardData(data) {
+        this.setState({cardData:combineObject(data.pay, data.income)})
     }
 
     render() {
-        let {monthData, lastMonthData, trendData, showSpinner} = this.state;
+        let {monthData, lastMonthData, trendData, cardData, showSpinner} = this.state;
         let colors = gradientColor(Color1, Color2, Object.keys(monthData.pay || 0).length);
-        let cardData = combineObject(monthData.pay, monthData.income);
         return (
             <View>
                 <Header/>
-                <Carousel monthData={monthData} lastMonthData={lastMonthData} trendData={trendData}/>
+                <Carousel monthData={monthData} lastMonthData={lastMonthData} trendData={trendData}
+                          setCardData={this.setCardData.bind(this)}/>
                 {
                     Object.keys(cardData).map((data, i) => <Card key={i} bank={BankMap[data].name} color={colors[i]}
                                                                  data={cardData[data]}/>)

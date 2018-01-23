@@ -7,6 +7,8 @@ import {VictoryLine, VictoryChart, VictoryAxis} from "victory-native";
 
 export default class CarouselComponent extends Component {
 
+    curPage = {};
+
     renderItem({item, index}) {
         let {monthData, lastMonthData, trendData} = this.props;
         if (!monthData.year) return null;
@@ -59,7 +61,8 @@ export default class CarouselComponent extends Component {
                         </View>
                     </View>
                 </View>
-            )
+            );
+            this.curPage[index] = monthData;
         }
         if (index === 2) {
             let {year, month, pay, income} = lastMonthData;
@@ -78,9 +81,15 @@ export default class CarouselComponent extends Component {
                         </View>
                     </View>
                 </View>
-            )
+            );
+            this.curPage[index] = lastMonthData;
         }
         return <LinearGradient colors={[Color1, Color2]} style={styles.card}>{cnt}</LinearGradient>;
+    }
+
+    onSnapToItem(index) {
+        let {setCardData} = this.props;
+        this.curPage[index] && setCardData(this.curPage[index])
     }
 
     render() {
@@ -88,9 +97,13 @@ export default class CarouselComponent extends Component {
             <Carousel
                 data={[0, 0, 0]}
                 renderItem={this.renderItem.bind(this)}
+                onSnapToItem={this.onSnapToItem.bind(this)}
                 sliderWidth={viewportWidth}
                 itemWidth={wp(80)}
                 firstItem={1}
+                enableMomentum={false}
+                enableSnap={true}
+                decelerationRate={'fast'}
             />
         )
     }
