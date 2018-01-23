@@ -1,9 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, {Component} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,7 +8,7 @@ import Card from './component/card';
 import {viewportWidth, viewportHeight, gradientColor, BankMap, Color1, Color2, combineObject} from "./Util";
 import {base, trend} from "./Analyse";
 import Spinner from 'react-native-spinkit';
-
+import SplashScreen from 'react-native-splash-screen';
 export default class App extends Component {
 
     state = {
@@ -26,6 +20,9 @@ export default class App extends Component {
 
     componentDidMount() {
         this.calculate();
+        // 2s关闭启动屏幕
+        setTimeout(()=>SplashScreen.hide(),1000);
+
     }
 
     async calculate() {
