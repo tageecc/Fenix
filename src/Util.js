@@ -30,12 +30,12 @@ export const getMonthByDelta = (delta) => {
     year = month < 1 ? (year - 1) : month > 12 ? (year + 1) : year;
     month = month < 1 ? (month + 12) : month > 12 ? (month - 12) : month;
 
-    let prev = new Date(`${year}-${month}-1`).getTime();
+    let prev = new Date(`${year}/${month}/1`).getTime();
     let next;
     if (month === 12) {
-        next = new Date(`${year + 1}-1-1`).getTime();
+        next = new Date(`${year + 1}/1/1`).getTime();
     } else {
-        next = new Date(`${year}-${month + 1}-1`).getTime();
+        next = new Date(`${year}/${month + 1}/1`).getTime();
     }
     return {year, month, prev, next}
 };

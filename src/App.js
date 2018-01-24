@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Text, TouchableOpacity, PermissionsAndroid} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import Header from './component/header';
@@ -15,17 +15,27 @@ export default class App extends Component {
         monthData: {},
         trendData: [],
         cardData:{},
-        showSpinner: false,
+        showSpinner: true,
     };
 
     componentDidMount() {
         this.calculate();
-        // 2s关闭启动屏幕
+        // 1s关闭启动屏幕
         setTimeout(()=>SplashScreen.hide(),1000);
 
     }
 
     async calculate() {
+
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_SMS,
+            {
+                'title': '请求获取短信权限',
+                'message': '该应用需要获取短信权限才能正常食用'
+            }
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
+
         this.setState({showSpinner: true});
         let monthData = await base(0);
         let lastMonthData = await base(-1);
@@ -45,7 +55,7 @@ export default class App extends Component {
 
     render() {
         let {monthData, lastMonthData, trendData, cardData, showSpinner} = this.state;
-        let colors = gradientColor(Color1, Color2, Object.keys(monthData.pay || 0).length);
+        let colors = gradientColor(Color1, Color2, Object.keys(monthData.pay || {}).length);
         return (
             <View>
                 <Header/>

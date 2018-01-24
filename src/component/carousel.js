@@ -5,6 +5,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import {wp, viewportWidth, Color1, Color2} from '../Util';
 import {VictoryLine, VictoryChart, VictoryAxis} from "victory-native";
 
+class Null extends Component {
+    render = () => <View></View>;
+}
+
 export default class CarouselComponent extends Component {
 
     curPage = {};
@@ -27,8 +31,8 @@ export default class CarouselComponent extends Component {
             cnt = (
                 <View pointerEvents="none">
                     <VictoryChart height={180} padding={0} style={styles.chart}>
-                        <VictoryAxis axisComponent={<View></View>}/>
-                        <VictoryAxis axisComponent={<View></View>} dependentAxis/>
+                        <VictoryAxis axisComponent={<Null></Null>}/>
+                        <VictoryAxis axisComponent={<Null></Null>} dependentAxis/>
                         <VictoryLine interpolation="natural"
                                      style={{data: {stroke: "#2296c2"}}}
                                      data={payData}
