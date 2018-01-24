@@ -119,7 +119,7 @@ android {
         release {
             try {
                 storeFile file("android.keystore")
-                keyAlias "android.keystore"
+                keyAlias "android"
                 keyPassword 'zzx123456'
                 storePassword 'zzx123456'
             }
@@ -132,7 +132,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            // signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
 
         }
     }
